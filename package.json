@@ -1,0 +1,23 @@
+{
+  "name": "gifter",
+  "version": "1.0.0",
+  "description": "Consent-based location sharing - sender generates link, friend clicks and allows location",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "location-sharing",
+    "geolocation",
+    "privacy",
+    "consent-based"
+  ],
+  "license": "MIT"
+}

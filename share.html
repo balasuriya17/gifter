@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#000000">
+  <title>Share Location - Gifter</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 32px 24px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .icon { width: 64px; height: 64px; margin: 0 auto 16px; color: #2563eb; }
+    h1 { font-size: 22px; font-weight: 600; color: #111827; margin-bottom: 8px; }
+    .subtitle { color: #6b7280; font-size: 15px; margin-bottom: 24px; }
+    .status { min-height: 48px; margin-bottom: 24px; }
+    .address-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: none;
+      text-align: left;
+    }
+    .address-box.visible { display: block; }
+    .address-label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .address-text { font-size: 15px; color: #111827; line-height: 1.5; word-break: break-word; }
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: none;
+      text-align: left;
+      color: #991b1b;
+    }
+    .error-box.visible { display: block; }
+    .btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+      margin-bottom: 10px;
+    }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-primary:active { background: #1e40af; }
+    .btn-secondary { background: #e5e7eb; color: #374151; }
+    .btn-secondary:hover { background: #d1d5db; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .loading { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .footer { margin-top: 16px; font-size: 12px; color: #9ca3af; }
+    .footer a { color: #2563eb; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="2" x2="12" y2="6"></line>
+      <line x1="12" y1="18" x2="12" y2="22"></line>
+      <line x1="2" y1="12" x2="6" x2="6" y2="12"></line>
+      <line x1="18" y1="12" x2="22" x2="22" y2="12"></line>
+    </svg>
+    <h1>Share Your Location</h1>
+    <p class="subtitle">Gifter needs your location to share with your friend</p>
+
+    <div class="status" id="status">
+      <span class="loading"></span> Getting your location…
+    </div>
+
+    <div class="address-box" id="addressBox">
+      <div class="address-label">Your Address</div>
+      <div class="address-text" id="addressText"></div>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <button class="btn btn-primary" id="copyBtn" onclick="copyAddress()" disabled>
+      <span id="copyBtnText">Copy Address</span>
+    </button>
+    <button class="btn btn-secondary" id="doneBtn" onclick="closePage()" disabled>Done</button>
+
+    <div class="footer">
+      Powered by <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a> · <a href="https://github.com/" target="_blank" rel="noopener">Gifter</a>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // CONFIGURATION - REPLACE ON DEPLOY
+    // ============================================
+    const CONFIG = {
+      backendUrl: '/.netlify/functions/share',  // Netlify Functions path
+      token: '',                                 // Injected from URL param
+      expiryMinutes: 24 * 60
+    };
+
+    // ============================================
+    // STATE
+    // ============================================
+    let currentAddress = '';
+    let currentLat = null;
+    let currentLon = null;
+
+    // ============================================
+    // DOM ELEMENTS
+    // ============================================
+    const statusEl = document.getElementById('status');
+    const addressBox = document.getElementById('addressBox');
+    const addressText = document.getElementById('addressText');
+    const errorBox = document.getElementById('errorBox');
+    const copyBtn = document.getElementById('copyBtn');
+    const copyBtnText = document.getElementById('copyBtnText');
+    const doneBtn = document.getElementById('doneBtn');
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Extract token from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      CONFIG.token = urlParams.get('token') || '';
+
+      if (!CONFIG.token) {
+        showError('Invalid link: missing token. Please ask your friend to send a new link.');
+        return;
+      }
+
+      // Request geolocation immediately on load
+      requestLocation();
+    });
+
+    // ============================================
+    // GEOLOCATION
+    // ============================================
+    function requestLocation() {
+      if (!navigator.geolocation) {
+        showError('Geolocation is not supported by your browser. Please use a modern browser.');
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        onLocationSuccess,
+        onLocationError,
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
+        }
+      );
+    }
+
+    function onLocationSuccess(position) {
+      currentLat = position.coords.latitude;
+      currentLon = position.coords.longitude;
+
+      statusEl.innerHTML = '<span class="loading"></span> Finding your address…';
+      reverseGeocode(currentLat, currentLon);
+    }
+
+    function onLocationError(error) {
+      let message = '';
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          message = 'Location permission was denied. Please refresh the page and tap "Allow" when prompted.';
+          break;
+        case error.POSITION_UNAVAILABLE:
+          message = 'Location information is unavailable. Please try again or move to an area with better GPS signal.';
+          break;
+        case error.TIMEOUT:
+          message = 'Location request timed out. Please try again.';
+          break;
+        default:
+          message = 'An unknown error occurred while getting your location.';
+      }
+      showError(message);
+    }
+
+    // ============================================
+    // REVERSE GEOCODING (OpenStreetMap Nominatim)
+    // ============================================
+    async function reverseGeocode(lat, lon) {
+      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetail=1`;
+
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'Gifter/1.0 (location-sharing-app)'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Geocoding failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.display_name) {
+          currentAddress = data.display_name;
+          displayAddress(currentAddress);
+          sendToBackend(lat, lon, currentAddress);
+        } else {
+          showError('Could not determine address from coordinates. Please try again.');
+        }
+      } catch (err) {
+        console.error('Reverse geocoding error:', err);
+        showError('Failed to look up address. Please check your connection and try again.');
+      }
+    }
+
+    // ============================================
+    // SEND TO BACKEND
+    // ============================================
+    async function sendToBackend(lat, lon, address) {
+      const url = `${CONFIG.backendUrl}/${CONFIG.token}`;
+
+      try {
+        await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lat, lon, address })
+        });
+        // Fire and forget - don't block UI on backend errors
+      } catch (err) {
+        console.error('Backend send error:', err);
+        // Silently fail - friend already sees their address
+      }
+    }
+
+    // ============================================
+    // UI HELPERS
+    // ============================================
+    function displayAddress(address) {
+      statusEl.style.display = 'none';
+      addressText.textContent = address;
+      addressBox.classList.add('visible');
+      copyBtn.disabled = false;
+      doneBtn.disabled = false;
+    }
+
+    function showError(message) {
+      statusEl.style.display = 'none';
+      errorBox.textContent = message;
+      errorBox.classList.add('visible');
+      doneBtn.disabled = false;
+    }
+
+    function copyAddress() {
+      if (!currentAddress) return;
+
+      navigator.clipboard.writeText(currentAddress).then(() => {
+        const originalText = copyBtnText.textContent;
+        copyBtnText.textContent = 'Copied!';
+        copyBtn.style.background = '#16a34a';
+        setTimeout(() => {
+          copyBtnText.textContent = originalText;
+          copyBtn.style.background = '';
+        }, 2000);
+      }).catch(err => {
+        console.error('Copy failed:', err);
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = currentAddress;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        copyBtnText.textContent = 'Copied!';
+        setTimeout(() => copyBtnText.textContent = 'Copy Address', 2000);
+      });
+    }
+
+    function closePage() {
+      // Try to close the tab/window (works if opened via window.open)
+      window.close();
+      // Fallback: redirect to blank
+      document.body.innerHTML = '<div style="padding:20px;text-align:center;color:#6b7280;">You can close this tab now.</div>';
+    }
+  </script>
+</body>
+</html>
