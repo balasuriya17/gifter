@@ -9,67 +9,326 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: #f5f5f5;
+      background: #000;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
+      color: #fff;
     }
     .container {
-      background: white;
-      border-radius: 16px;
-      padding: 32px 24px;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 20px;
+      padding: 40px 28px;
       max-width: 480px;
       width: 100%;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.05),
+        0 25px 50px -12px rgba(0,0,0,0.8),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+      position: relative;
+      overflow: hidden;
     }
-    h1 { font-size: 24px; font-weight: 600; color: #111827; margin-bottom: 8px; }
-    .subtitle { color: #6b7280; font-size: 15px; margin-bottom: 24px; }
-    .status { margin-bottom: 24px; }
-    .status-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
-    .status-item:last-child { border-bottom: none; }
-    .label { color: #6b7280; font-size: 14px; }
-    .value { color: #111827; font-weight: 500; font-size: 14px; word-break: break-word; }
-    .address-section { margin-top: 24px; padding: 16px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #2563eb; }
-    .address-title { font-size: 13px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .address-text { font-size: 15px; color: #111827; line-height: 1.5; word-break: break-word; }
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+    }
+    .logo-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke: #fff;
+    }
+    .logo-text {
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, #ff6b35 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+    .subtitle {
+      color: #888;
+      font-size: 15px;
+      text-align: center;
+      margin-bottom: 32px;
+      font-weight: 400;
+    }
+    .status { margin-bottom: 28px; }
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      transition: all 0.2s ease;
+    }
+    .status-item:hover {
+      border-color: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+    }
+    .status-item:last-child { margin-bottom: 0; }
+    .label {
+      color: #666;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+    .value {
+      color: #fff;
+      font-weight: 500;
+      font-size: 14px;
+      word-break: break-word;
+      max-width: 65%;
+      text-align: right;
+    }
+    .address-section {
+      margin-top: 28px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(247,147,30,0.1) 100%);
+      border: 1px solid rgba(255,107,53,0.3);
+      border-radius: 14px;
+      position: relative;
+      overflow: hidden;
+      animation: slideUp 0.4s ease-out;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .address-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #ff6b35, #f7931e);
+    }
+    .address-title {
+      font-size: 11px;
+      color: #ff6b35;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .address-text {
+      font-size: 16px;
+      color: #fff;
+      line-height: 1.5;
+      word-break: break-word;
+      font-weight: 500;
+    }
     .btn {
       width: 100%;
-      padding: 14px 20px;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 500;
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
       border: none;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: all 0.2s ease;
       margin-top: 12px;
+      letter-spacing: 0.3px;
     }
-    .btn-primary { background: #2563eb; color: white; }
-    .btn-primary:hover { background: #1d4ed8; }
-    .btn-secondary { background: #e5e7eb; color: #374151; }
-    .btn-secondary:hover { background: #d1d5db; }
-    .link-section { margin-top: 24px; padding: 16px; background: #eff6ff; border-radius: 10px; }
-    .link-label { font-size: 12px; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    .link-url { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; font-family: monospace; font-size: 13px; color: #0f172a; word-break: break-all; cursor: pointer; }
-    .link-url:hover { background: #f1f5f9; }
-    .hidden { display: none; }
-    .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #2563eb; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 6px 28px rgba(255, 107, 53, 0.5);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      color: #ccc;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+    .link-section { margin-top: 24px; }
+    .link-label {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    .link-url {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 13px;
+      color: #aaa;
+      word-break: break-all;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .link-url:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,107,53,0.3);
+      color: #ff6b35;
+    }
+    .link-url:focus { outline: none; }
+    .link-url::after {
+      content: 'Click to copy';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: #555;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .link-url:hover::after { opacity: 1; }
+    .hidden { display: none !important; }
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-top-color: #ff6b35;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .copy-status { font-size: 12px; color: #16a34a; margin-left: 8px; opacity: 0; transition: opacity 0.3s; }
+    .copy-status {
+      font-size: 12px;
+      color: #22c55e;
+      margin-left: 10px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-weight: 500;
+    }
     .copy-status.visible { opacity: 1; }
-    .no-location { color: #9ca3af; font-style: italic; }
+    .no-location { color: #666; font-style: italic; }
+    .pulse-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,107,53,0.3);
+      animation: pulse 2s ease-out infinite;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .pulse-ring:nth-child(2) { animation-delay: 0.5s; }
+    .pulse-ring:nth-child(3) { animation-delay: 1s; }
+    @keyframes pulse {
+      0% { width: 60px; height: 60px; opacity: 0.6; }
+      100% { width: 120px; height: 120px; opacity: 0; }
+    }
+    .waiting-animation {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 16px;
+    }
+    .waiting-animation .dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: linear-gradient(135deg, #ff6b35, #f7931e);
+      border-radius: 50%;
+      animation: bounce 1.4s ease-in-out infinite both;
+    }
+    .waiting-animation .dot:nth-child(1) { left: 0; animation-delay: -0.32s; }
+    .waiting-animation .dot:nth-child(2) { left: 34px; animation-delay: -0.16s; }
+    .waiting-animation .dot:nth-child(3) { right: 0; animation-delay: 0; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+    .token-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,107,53,0.15);
+      border: 1px solid rgba(255,107,53,0.3);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #ff6b35;
+      font-weight: 600;
+      font-family: monospace;
+    }
+    .footer {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      text-align: center;
+      font-size: 12px;
+      color: #444;
+    }
+    .footer a { color: #666; text-decoration: none; transition: color 0.2s; }
+    .footer a:hover { color: #ff6b35; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Gifter</h1>
-    <p class="subtitle">Share your location with a friend</p>
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 12 20 22 4 22 4 12"></polyline>
+          <rect x="2" y="7" width="20" height="5" rx="1"></rect>
+          <line x1="12" y1="22" x2="12" y2="7"></line>
+          <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+          <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+        </svg>
+      </div>
+      <span class="logo-text">Gifter</span>
+    </div>
+    <p class="subtitle">Share location, send surprises</p>
 
     <div class="status">
       <div class="status-item">
         <span class="label">Token</span>
-        <span class="value" id="tokenDisplay">Generating…</span>
+        <span class="value" id="tokenDisplay">
+          <span class="token-badge">Generating…</span>
+        </span>
       </div>
       <div class="status-item">
         <span class="label">Share Link</span>
@@ -77,13 +336,20 @@
       </div>
       <div class="status-item">
         <span class="label">Status</span>
-        <span class="value" id="statusDisplay">Waiting for friend…</span>
+        <span class="value" id="statusDisplay">
+          <div class="waiting-animation" id="waitingAnim">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          Waiting for friend…
+        </span>
       </div>
     </div>
 
     <div class="link-section">
       <div class="link-label">Send this link to your friend</div>
-      <div class="link-url" id="shareLink" onclick="copyLink()">
+      <div class="link-url" id="shareLink" onclick="copyLink()" tabindex="0" role="button" aria-label="Copy share link">
         Loading link…
       </div>
     </div>
@@ -93,17 +359,21 @@
     </button>
 
     <div class="address-section hidden" id="addressSection">
-      <div class="address-title">Friend's Location</div>
-      <div class="address-text" id="friendAddress">Friend is at:</div>
+      <div class="address-title">Gift Delivered</div>
+      <div class="address-text" id="friendAddress">Friend's location received</div>
     </div>
 
     <button class="btn btn-primary hidden" id="generateBtn" onclick="generateNewToken()">
-      Generate New Link
+      Create New Gift Link
     </button>
 
     <button class="btn btn-secondary hidden" id="stopBtn" onclick="stopSharing()">
       Stop Sharing
     </button>
+
+    <div class="footer">
+      Powered by <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a> · <a href="https://github.com/balasuriya17/gifter" target="_blank" rel="noopener">Gifter</a>
+    </div>
   </div>
 
   <script>
@@ -126,6 +396,7 @@
     const friendAddress = document.getElementById('friendAddress');
     const generateBtn = document.getElementById('generateBtn');
     const stopBtn = document.getElementById('stopBtn');
+    const waitingAnim = document.getElementById('waitingAnim');
 
     // ============================================
     // INITIALIZATION
@@ -158,14 +429,21 @@
         currentToken = data.token;
 
         // Update display
-        tokenDisplay.textContent = currentToken;
+        tokenDisplay.innerHTML = `<span class="token-badge">${currentToken}</span>`;
         const baseUrl = window.location.origin;
         const fullLink = `${baseUrl}/share.html?token=${currentToken}`;
         shareLink.textContent = fullLink;
         linkDisplay.textContent = fullLink;
 
         // Reset status
-        statusDisplay.textContent = 'Waiting for friend…';
+        statusDisplay.innerHTML = `
+          <div class="waiting-animation" id="waitingAnim">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          Waiting for friend…
+        `;
         statusDisplay.className = 'value no-location';
 
         // Show/hide buttons
@@ -178,7 +456,7 @@
 
       } catch (err) {
         console.error('Error generating token:', err);
-        statusDisplay.textContent = 'Error - check if server is running';
+        statusDisplay.textContent = 'Error - check connection';
         statusDisplay.className = 'value';
       }
     }
@@ -205,18 +483,28 @@
             // Friend's location received
             friendAddress.textContent = data.address;
             addressSection.classList.remove('hidden');
-            statusDisplay.textContent = 'Location received!';
+            statusDisplay.textContent = 'Gift delivered! Location received';
             statusDisplay.className = 'value';
+            statusDisplay.style.color = '#22c55e';
           }
         } else {
           const error = await response.json();
           if (error.error === 'Sharing ended') {
             statusDisplay.textContent = 'Sharing stopped';
             statusDisplay.className = 'value';
+            statusDisplay.style.color = '#ef4444';
           } else if (error.error === 'Token not found or expired') {
             // Still waiting
-            statusDisplay.textContent = 'Waiting for friend…';
+            statusDisplay.innerHTML = `
+              <div class="waiting-animation" id="waitingAnim">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+              </div>
+              Waiting for friend…
+            `;
             statusDisplay.className = 'value no-location';
+            statusDisplay.style.color = '';
           }
         }
       } catch (err) {
@@ -224,6 +512,7 @@
         console.error('Poll error:', err);
         statusDisplay.textContent = 'Connection error – retrying…';
         statusDisplay.className = 'value';
+        statusDisplay.style.color = '#f59e0b';
       }
     }
 
@@ -234,7 +523,11 @@
       try {
         await navigator.clipboard.writeText(shareLink.textContent);
         copyStatusEl.classList.add('visible');
-        setTimeout(() => copyStatusEl.classList.remove('visible'), 2000);
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          copyStatusEl.classList.remove('visible');
+          copyBtn.textContent = 'Copy Link';
+        }, 2000);
       } catch (err) {
         // Fallback
         const textarea = document.createElement('textarea');
@@ -244,9 +537,21 @@
         document.execCommand('copy');
         document.body.removeChild(textarea);
         copyStatusEl.classList.add('visible');
-        setTimeout(() => copyStatusEl.classList.remove('visible'), 2000);
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          copyStatusEl.classList.remove('visible');
+          copyBtn.textContent = 'Copy Link';
+        }, 2000);
       }
     }
+
+    // Also handle keyboard on link-url
+    shareLink.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        copyLink();
+      }
+    });
 
     // ============================================
     // STOP SHARING
@@ -257,6 +562,7 @@
       try {
         await fetch(`/.netlify/functions/stop/${currentToken}`, { method: 'POST' });
         statusDisplay.textContent = 'Sharing stopped';
+        statusDisplay.style.color = '#ef4444';
         addressSection.classList.add('hidden');
         clearInterval(pollingInterval);
       } catch (err) {
